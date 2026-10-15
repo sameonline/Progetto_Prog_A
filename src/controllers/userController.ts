@@ -38,4 +38,10 @@ export class UserController{
       res.status(500).json({ error: "Errore del server" });
     }
   };
+
+    rechargeTokens = async (req: Request, res: Response): Promise<void> => {
+        console.log("ricarica token")
+    };
 }
+
+export const userController = new UserController();
