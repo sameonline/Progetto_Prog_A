@@ -27,6 +27,10 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   getNameAsciiCodes(): number[] {
     return Array.from(this.name).map((char) => char.charCodeAt(0));
   }
+
+  rechargeToken(token: number): void {
+    this.tokens+=token
+  }
 }
 
 //definisco le colonne

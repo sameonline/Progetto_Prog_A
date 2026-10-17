@@ -44,7 +44,7 @@ Move.init(
       
     },
     stato: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM,
       allowNull: false,
       values: ["colpito", "colpito e affondato", "mancato", "silenzio"]
     },

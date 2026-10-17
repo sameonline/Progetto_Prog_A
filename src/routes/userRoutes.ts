@@ -1,14 +1,10 @@
 import { Router } from "express";
-import { userController } from "../controllers/userController";
-
-// Un router è un gruppo di rotte, che poi verrà collegato all'app in index.ts
-const userRoutes = Router();
-
-//rotta per ottenere i token dell'utente
-userRoutes.get("/users/:email/tokens", userController.getTokens);
+import { UserController } from "../controllers/userController";
 
 
-//rotta per ricaricare i token all'utente
-userRoutes.put("/users/tokens", userController.rechargeTokens); // esempio body:{"email: jane@gamil.com,"tokens": 145"}
-
-export default userRoutes;
+export function createUserRoutes(userController: UserController): Router {
+  const router = Router();
+  router.get("/users/:email/tokens", userController.getTokens);
+  router.put("/users/tokens", userController.rechargeTokens);
+  return router;
+}
