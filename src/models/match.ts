@@ -131,7 +131,7 @@ export class Match extends Model<InferAttributes<Match>, InferCreationAttributes
         this.turn=this.player1
       }
     }
-    shotBot(): string{
+    shotBot(): [number[],string]{
       let fake_shot:boolean=true
       let decision:number[]=[]
       while (fake_shot){
@@ -143,7 +143,8 @@ export class Match extends Model<InferAttributes<Match>, InferCreationAttributes
           decision.push(y);
         }
       }
-      return this.shot(decision,this.player2);
+      let esito=this.shot(decision,this.player2);
+      return [decision,esito];
     }
 
     shot(position:number[],id: number | null = null): string{//id non is passa se gioca il bot

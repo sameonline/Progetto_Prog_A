@@ -73,22 +73,79 @@ export class MatchController{
   }
   move=async(req: Request, res: Response): Promise<void>=>{
     try{
-      const {shot,idPlayer,idMatch}=req.body ?? {};
-      const match= await this.matchDao.findById(idMatch);
-      if (match===null){
-        res.status(200).json({message:"Partita non trovata"})
+      const { shot, idPlayer, idMatch } = req.body ?? {};
+
+      // 1) conversione e validazione degli id
+      const playerId = Number(idPlayer);
+      const matchId = Number(idMatch);
+      if (!Number.isInteger(playerId) || playerId <= 0 || !Number.isInteger(matchId) || matchId <= 0) {
+        res.status(400).json({ error: "idPlayer e idMatch devono essere interi positivi" });
         return;
       }
-      let esito: string=match.shot(shot,idPlayer)
+
+      // 2) forma delle coordinate: array di 2 interi
+      if (!Array.isArray(shot) || shot.length !== 2 || !shot.every((c) => Number.isInteger(c))) {
+        res.status(400).json({ error: "shot deve essere un array di 2 interi [riga, colonna]" });
+        return;
+      }
+
+      // 3) la partita esiste
+      const match = await this.matchDao.findById(matchId);
+      if (match === null) {
+        res.status(404).json({ error: "Partita non trovata" });
+        return;
+      }
+
+      // 4) la partita è in corso
+      if (match.stato !== "Incorso") {
+        res.status(400).json({ error: "La partita è terminata" });
+        return;
+      }
+
+      // 5) il giocatore fa parte della partita
+      if (playerId !== match.player1 && playerId !== match.player2) {
+        res.status(403).json({ error: "Non fai parte di questa partita" });
+        return;
+      }
+
+      // 6) è il suo turno
+      if (match.turn !== playerId) {
+        res.status(403).json({ error: "Non è il tuo turno" });
+        return;
+      }
+
+      // 7) coordinate dentro la griglia
+      const [riga, colonna] = shot;
+      if (riga < 0 || riga >= match.dimGrid || colonna < 0 || colonna >= match.dimGrid) {
+        res.status(400).json({ error: `Coordinate fuori dalla griglia (da 0 a ${match.dimGrid - 1})` });
+        return;
+      }
+      let esito: string=match.shot(shot,playerId)
       await this.matchDao.save(match);
       const move = Move.build({
         matchId: match.id,
-        playerId: idPlayer,
+        playerId: playerId,
         coordinate: shot,
         stato: esito,
         silence: false,
       });
       await this.moveDao.save(move);
+      // shot del bot
+      if (match.bot && match.stato==="Incorso"){
+
+        const [shot_bot,esito_bot]=match.shotBot();
+        await this.matchDao.save(match);
+        const move_bot = Move.build({
+        matchId: match.id,
+        playerId: null,//è il bot
+        coordinate: shot_bot,
+        stato: esito_bot,
+        silence: false,
+      });
+      await this.moveDao.save(move_bot);
+        res.status(200).json({message:"mossa eseguita e bot risponde: "+ shot_bot})
+        return;
+      }
       res.status(200).json({message:"mossa eseguita"})
     }
     catch(error){
