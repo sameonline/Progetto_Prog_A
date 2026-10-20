@@ -15,9 +15,10 @@ export class Move extends Model<InferAttributes<Move>, InferCreationAttributes<M
   // "declare": la proprietà esiste per TypeScript, ma il valore lo gestisce Sequelize.
   declare id: CreationOptional<number>;
   declare matchId: number;
-  declare playerId: number;
-  declare coordinate:number;
-  declare stato: string;;
+  declare playerId:CreationOptional<number | null>;//se il bot fa la mossa non si passa l'id che idventa quindi null
+  declare coordinate:number[];
+  declare stato: string;
+  declare silence: CreationOptional<boolean>;
 
   
 }
@@ -36,17 +37,23 @@ Move.init(
     },
     playerId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     coordinate: {
-      type: DataTypes.ENUM,
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
       allowNull: false,
       
     },
     stato: {
-      type: DataTypes.ENUM,
+      type: DataTypes.STRING,
       allowNull: false,
-      values: ["colpito", "colpito e affondato", "mancato", "silenzio"]
+      
+    },
+    silence:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue:false,
+      
     },
   },
   {

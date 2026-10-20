@@ -23,10 +23,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare tokens: CreationOptional<number>;
   declare admin: CreationOptional<boolean>;
 
-  // Metodo d'istanza: TypeScript normale, lavora sui valori di QUESTO utente.
-  getNameAsciiCodes(): number[] {
-    return Array.from(this.name).map((char) => char.charCodeAt(0));
-  }
+  
 
   rechargeToken(token: number): void {
     this.tokens+=token
@@ -49,6 +46,7 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      validate: { isEmail: true },
       
     },
     password: {
@@ -59,6 +57,7 @@ User.init(
       type: DataTypes.FLOAT,
       allowNull: false,
       defaultValue: 0,
+      validate: { min: 0 },
       
     },
     admin: {
