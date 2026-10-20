@@ -28,6 +28,9 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   rechargeToken(token: number): void {
     this.tokens+=token
   }
+  removeToken(token:number):void{
+    this.tokens-=token
+  }
 }
 
 //definisco le colonne

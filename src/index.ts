@@ -9,6 +9,7 @@ import { createMatchRoutes } from "./routes/matchRoutes";
 import { Match } from "./models/match";
 import { UserController } from "./controllers/userController";
 import { MatchController } from "./controllers/matchController";
+import bcrypt from "bcryptjs";//oggetto che cifra
 
 
 const app = express();
@@ -40,8 +41,20 @@ async function start() {
 
     await sequelize.sync({ force: true });
  
-    const p1 = User.build({ name: 'Jane', email: 'jane@example.com', password: 'password123' });
-    const p2 = User.build({ name: 'mario', email: 'mario@example.com', password: 'password123' });
+    const hashedPassword = await bcrypt.hash("password123", 10);
+
+    const p1 = User.build({ name: "Jane", email: "jane@example.com", password: hashedPassword, tokens: 10 });
+    const p2 = User.build({ name: "mario", email: "mario@example.com", password: hashedPassword, tokens: 10 });
+    const p3 = User.build({ name: "luigi", email: "luigi@example.com", password: hashedPassword, tokens: 10 });
+    const p4 = User.build({ name: "filippo", email: "filippo@example.com", password: hashedPassword, tokens: 10 });
+    const admin = User.build({ name: "admin", email: "admin@example.com", password: hashedPassword, tokens: 0, admin: true });
+
+    await userDao.save(p1);
+    await userDao.save(p2);
+    await userDao.save(p3);
+    await userDao.save(p4);
+    await userDao.save(admin);
+    console.log("Utenti di prova creati, id:", p1.id, p2.id, admin.id);
   
 
     

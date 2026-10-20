@@ -20,7 +20,9 @@ export class Move extends Model<InferAttributes<Move>, InferCreationAttributes<M
   declare stato: string;
   declare silence: CreationOptional<boolean>;
 
-  
+  setSilence():void{
+      this.silence=true;
+  }
 }
 
 //definisco le colonne

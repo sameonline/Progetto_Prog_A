@@ -1,5 +1,7 @@
-import { UserDao, UserDaoImpl } from "../dao/userDao";
+import { UserDao } from "../dao/userDao";
 import { User } from "../models/user";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 import { Request, Response } from "express";
 
@@ -13,7 +15,38 @@ export class UserController{
   }
    
   login = async (req: Request, res: Response): Promise<void> => {
-    
+    try{
+        const{ email,psw}=req.body ?? {};
+      
+      
+      const user = await this.userDao.userByMail(email.trim());
+      if (user === null || !(await bcrypt.compare(psw, user.password))) {
+        res.status(401).json({ error: "credenziali non valide" });
+        return;
+      }
+
+      
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        console.error("JWT_SECRET non configurato");
+        res.status(500).json({ error: "errore del server" });
+        return;
+      }
+
+      
+      const token = jwt.sign(
+        { id: user.id, email: user.email, admin: user.admin },
+        secret,
+        { expiresIn: "1h", algorithm: "HS256" }
+      );
+
+      res.status(200).json({ token });
+
+    }
+    catch(error){
+      res.status(500).json({ error: "errore del server" });
+          return;
+    }
   };
 
   getTokens = async (req: Request, res: Response): Promise<void> => {

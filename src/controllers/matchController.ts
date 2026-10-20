@@ -7,6 +7,9 @@ import { MoveDao } from "../dao/moveDao";
 import { Move } from "../models/move";
 
 import { Request, Response } from "express";
+import { AuthUser } from "../middleware/autMiddleware";
+const COSTO_PARTITA:number=0.35;
+const COSTO_MOSSA:number=0.015
 
 export class MatchController{
    constructor(
@@ -15,21 +18,49 @@ export class MatchController{
     private moveDao: MoveDao<Move>,
   ) {}
 
+
+
   newMatch=async (req:Request, res:Response): Promise<void>=>{
     try{
-      const { player1, player2, dimGrid, ships, silence,bot } = req.body ?? {};
+      const user = res.locals.user as AuthUser;
+      const {  player2, dimGrid, ships, silence,bot } = req.body ?? {};
       let p2=null;
-      const p1= await this.userDao.userByMail(player1)
+      let token =await this.userDao.getTokenById(user.id);
+      if (token===null){
+        token=0
+      }
+      if (token<COSTO_PARTITA){
+        res.status(401).json({ error: "Giocatore con crediti inferiori a 0,35" });
+        return
+      }
+      
       if (bot===false){p2= await this.userDao.userByMail(player2)}
       
      
-      if (p1===null || (p2===null && bot===false)) {
-      res.status(404).json({ error: "Giocatore non trovato" });
+      if (p2===null && bot===false) {
+      res.status(404).json({ error: "Giocatore 2 non trovato" });
       return;
         }
+
+      if (bot && player2 !== undefined) {
+        res.status(400).json({ error: "In una partita contro il bot non va indicato player2" });
+        return;
+      }
+      if (!bot && (typeof player2 !== "string" || player2.trim() === "")) {
+        res.status(400).json({ error: "In una partita tra giocatori serve l'email di player2" });
+        return;
+      }
       if (this.isPossibleToPlay(ships,dimGrid)){
-          const match:Match= await this.creaMatch(p1.id,p2?.id ?? null,dimGrid,ships,silence,bot);
+          const match:Match= await this.creaMatch(user.id,p2?.id ?? null,dimGrid,ships,silence,bot);
           await this.matchDao.save(match);
+          // la partita è stata creata: scalo il costo a chi l'ha creata
+          const utente = await this.userDao.findById(user.id);
+          if (utente === null) {
+          res.status(401).json({ error: "Utente non trovato" });
+          return;
+          }
+          utente.removeToken(COSTO_PARTITA);
+          await this.userDao.save(utente);
           res.status(201).json({
           message: "Partita creata, id: "+ match.id,});
           return;
@@ -71,12 +102,28 @@ export class MatchController{
     this.printTable(match)
     return match
   }
+
+  
+
+  async applySilence(id:number):Promise<void>{
+    const move= await this.moveDao.getById(id);
+    if (move===null){
+      return
+    }
+    else{
+         move.setSilence();
+    }
+    return
+   
+
+  }
   move=async(req: Request, res: Response): Promise<void>=>{
     try{
-      const { shot, idPlayer, idMatch } = req.body ?? {};
+      const user = res.locals.user as AuthUser;
+      const { shot, idMatch } = req.body ?? {};
 
       // 1) conversione e validazione degli id
-      const playerId = Number(idPlayer);
+      const playerId = user.id;
       const matchId = Number(idMatch);
       if (!Number.isInteger(playerId) || playerId <= 0 || !Number.isInteger(matchId) || matchId <= 0) {
         res.status(400).json({ error: "idPlayer e idMatch devono essere interi positivi" });
