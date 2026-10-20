@@ -1,7 +1,6 @@
 import { Match } from "../models/match";
 
-// Partita contro il bot: player2 è null, il bot spara su grid1 (quella di player1).
-// La nave "A" di player1 è in [0,0] e [0,1].
+
 function partitaControBot(): Match {
   return Match.build({
     player1: 1,
