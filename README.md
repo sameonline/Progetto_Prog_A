@@ -5,7 +5,7 @@
 L'obiettivo del progetto è di realizzare un sistema che constenta di gestire il gioco della battaglia navale. In particolare, il sistema deve prevedere la possibilità di far interagire 2 utenti autenticati mediante JWT. l'utente può decidere se giocare con un secondo giocatore o contro un bot. La partita giocata dagli utenti può essere classica oppure avere una versione alternativa, dove i giocatori possono omettere l'esito di un colpo subito (massimo 5 volte se previsto). Ogni creazione di una partita e ogni mossa eseguita hanno un costo di token che viene scalato da una quantità appartenente ai giocatori. Il sistema deve prevedere anche la possibilità di ricaricare i token a un giocatore da parte di un admin del gioco. 
 
 ## Progettazione
-### Strumenti adottati nel progetto
+### Strumenti adottati nel progetto.
 - Docker
 - Node.js
 - Sequelize
@@ -102,7 +102,7 @@ Aprire `.env` e sostituire il valore di `JWT_SECRET` con una stringa lunga e cas
 ```bash
 docker compose up --build
 ```
-
+Il progetto ha un file index che predispone il backend di un database inizialmente vuoto e la creazione di 4 utenti di prova, 3 giocatori ed un admin.
 ## Test
 
 Per eseguire i test, scrivere nel terminale (fuori dal Docker): 
