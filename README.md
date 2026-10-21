@@ -43,6 +43,7 @@ In questa sezione viene riportato il diagramma dei Casi d'uso che coprono tutte 
 ### Diagramma UML
 
 Il seguente diagramma UML mostra la correlazione tra le classi che definiscno le principali entità del sistema.
+![Diagramma UML delle classi](immagini/uml.png)
 
 ### Diagrammi di sequenza
 In questa sezione sono riportati i diagrammi di sequenza dei meccanismi più complessi del progetto.
