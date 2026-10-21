@@ -10,7 +10,7 @@ import { Match } from "./models/match";
 import { UserController } from "./controllers/userController";
 import { MatchController } from "./controllers/matchController";
 import bcrypt from "bcryptjs";//oggetto che cifra
-
+import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 app.use(express.json());
@@ -25,6 +25,7 @@ const matchController = new MatchController(matchDao, userDao, moveDao);
 //rotte
 app.use("/api", createUserRoutes(userController));//quando arriva una richiesta con api come inzio express lavora
 app.use("/api", createMatchRoutes(matchController));
+app.use(errorHandler);//gestione errori
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -41,12 +42,12 @@ async function start() {
 
     await sequelize.sync({ force: true });
  
-    const hashedPassword = await bcrypt.hash("password123", 10);
+    const hashedPassword = await bcrypt.hash("password123", 10);//10 è il numero di iterazioni per cifrare
 
     const p1 = User.build({ name: "Jane", email: "jane@example.com", password: hashedPassword, tokens: 10 });
     const p2 = User.build({ name: "mario", email: "mario@example.com", password: hashedPassword, tokens: 10 });
     const p3 = User.build({ name: "luigi", email: "luigi@example.com", password: hashedPassword, tokens: 10 });
-    const p4 = User.build({ name: "filippo", email: "filippo@example.com", password: hashedPassword, tokens: 10 });
+    const p4 = User.build({ name: "filippo", email: "filippo@example.com", password: hashedPassword, tokens: 0 });
     const admin = User.build({ name: "admin", email: "admin@example.com", password: hashedPassword, tokens: 0, admin: true });
 
     await userDao.save(p1);
@@ -66,15 +67,6 @@ async function start() {
 
     
 
-    
-
-    
-    
-    
-    //console.log(match.shot([0,1],1))
-    //await match.save();
-    
-  
 
     app.listen(PORT, () => {
       console.log(`Server porta: ${PORT}`);
