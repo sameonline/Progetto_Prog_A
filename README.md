@@ -39,6 +39,7 @@ Analizzando le specifiche del progetto, sono stati individuati i seguenti requis
 ### Diagramma Casi d'uso
 
 In questa sezione viene riportato il diagramma dei Casi d'uso che coprono tutte le funzionalità del progetto riportate nella sezione dei requisiti.
+![Diagramma casi d'uso](src/immagini/useCase.png)
 
 ### Diagramma UML
 
@@ -46,9 +47,13 @@ Il seguente diagramma UML mostra la correlazione tra le classi che definiscno le
 ![Diagramma UML delle classi](src/immagini/uml.png)
 
 ### Diagrammi di sequenza
-In questa sezione sono riportati i diagrammi di sequenza dei meccanismi più complessi del progetto.
+In questa sezione sono riportati i diagrammi di sequenza che mostrano come il sistema gestisce la mossa eseguita da un giocatore  e il recupero di uno stato di una partita.
 Il seguente diagramma evidenzia i meccanismi che si attivano nell'esecuzione di un colpo eseguito da un giocatore.
+![Diagramma di sequenza della mossa](src/immagini/diagSeqPa.drawio.svg)
 
+Il seguente diagramma mostra come il sistema gestisce il recupero di uno stato di una data partita.
+
+![Diagramma di sequenza per recuperare lo stato di una partita](src/immagini/stateUml.png)
 ## Implementazione
 
 ### Pattern adottati
@@ -74,7 +79,7 @@ Per eseguire una corretta installazione è necessario avere i seguenti strumenti
 ### 1. Clonare il repository
 
 ```bash
-git clone <URL-del-repository>
+git clone https://github.com/sameonline/Progetto_Prog_A
 cd Progetto_Prog_A
 ```
 
@@ -104,3 +109,5 @@ Per eseguire i test, scrivere nel terminale (fuori dal Docker):
 ```bash
 npm test
 ```
+## Autore
+Di Summa Samuele: s1135121
